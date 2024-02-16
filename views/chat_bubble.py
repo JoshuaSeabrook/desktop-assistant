@@ -14,7 +14,7 @@ class ChatBubble(QWidget):
 
         if sender == Sender.USER:
             self.label.setStyleSheet(
-                "QLabel { background-color: #0078d7; color: white; border-radius: 10px; padding: 5px; }")
+                "QLabel { background-color: #873f9d; color: white; border-radius: 10px; padding: 5px; }")
         else:  # Sender.ASSISTANT
             self.label.setStyleSheet(
-                "QLabel { background-color: #f0f0f0; color: black; border-radius: 10px; padding: 5px; }")
+                "QLabel { background-color: #333333; color: white; border-radius: 10px; padding: 5px; }")

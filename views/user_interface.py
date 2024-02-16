@@ -24,14 +24,17 @@ class MainWindow(QMainWindow):
         self.inputLayout = QHBoxLayout()
         self.userInput = QLineEdit()
         self.userInput.setPlaceholderText("Message assistant...")
+        self.userInput.returnPressed.connect(self.send_message)
         self.inputLayout.addWidget(self.userInput)
 
-        self.sendButton = QPushButton("Send")
-        self.inputLayout.addWidget(self.sendButton)
+        self.chatButton = QPushButton("Chat")
+        self.chatButton.setFixedWidth(50)
+
+        self.inputLayout.addWidget(self.chatButton, 0, Qt.AlignRight)
         self.layout.addLayout(self.inputLayout)
         self.centralWidget.setLayout(self.layout)
 
-        self.sendButton.clicked.connect(self.send_message)
+        self.chatButton.clicked.connect(self.toggle_input_window)
         self.position_window()
 
         # Styling
@@ -39,17 +42,19 @@ class MainWindow(QMainWindow):
             QMainWindow {
                 background-color: transparent;  
             }
+            QLineEdit {
+                background-color: #333333;
+                color: white;
+                border: 1px solid #808080;
+                border-radius: 10px;
+                padding: 5px;
+            }
             QListWidget {
                 background-color: transparent;  
                 border: none;  
             }
-            QLineEdit {
-                border: 1px solid #dcdcdc;
-                padding: 5px;
-                font-size: 14px;
-            }
             QPushButton {
-                background-color: #0078d7;
+                background-color: #873f9d;
                 color: white;
                 padding: 5px;
                 font-size: 14px;
@@ -66,17 +71,22 @@ class MainWindow(QMainWindow):
     def position_window(self):
         # Positions and resizes the window. Currently set to 600px width and full height,
         # on the right side of the screen.
+        SCREEN_PERCENTAGE = 0.7  # Percentage of the screen height to use
         screen = QApplication.primaryScreen().geometry()
         screen_width = screen.width()
 
         window_width = 600
-        window_height = screen.height()
+        window_height = int(screen.height() * SCREEN_PERCENTAGE)
         self.setFixedSize(window_width, window_height)
 
         x = screen_width - window_width
-        y = 0
+        y = int(screen.height() * (1 - SCREEN_PERCENTAGE) / 2)
 
         self.move(x, y)
+
+    def toggle_input_window(self):
+        # Toggle the visibility of the userInput widget
+        self.userInput.setVisible(not self.userInput.isVisible())
 
     def send_message(self):
         user_text = self.userInput.text().strip()

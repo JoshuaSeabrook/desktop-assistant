@@ -34,13 +34,13 @@ class ApplicationController:
         self.thread.start()
 
     def process_input(self, user_input):
-        self.view.sendButton.setEnabled(False)
+        self.view.userInput.setEnabled(False)
         self.view.display_message(user_input, Sender.USER)
         QMetaObject.invokeMethod(self.inputProcessor, 'process', Q_ARG(str, user_input))
 
     def update_ui_with_response(self, response):
         self.view.display_message(response)
-        self.view.sendButton.setEnabled(True)
+        self.view.userInput.setEnabled(True)
 
     def run(self):
         self.view.show()
