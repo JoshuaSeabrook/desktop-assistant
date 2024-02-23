@@ -1,4 +1,5 @@
-from PyQt5.QtCore import QPropertyAnimation, pyqtSignal, QEasingCurve
+import markdown
+from PyQt5.QtCore import QPropertyAnimation, pyqtSignal, QEasingCurve, Qt
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel, QGraphicsOpacityEffect
 
 from enums import Sender
@@ -10,17 +11,26 @@ class ChatBubble(QWidget):
     def __init__(self, text, sender):
         super().__init__()
         layout = QVBoxLayout()
-        self.label = QLabel(text)
+
+        # Convert Markdown text to HTML
+        html_text = markdown.markdown(text)
+
+        self.label = QLabel()
         self.label.setWordWrap(True)
+        self.label.setText(html_text)
         layout.addWidget(self.label)
         self.setLayout(layout)
 
+        # Apply CSS styles for USER and ASSISTANT differently
+        user_style = "QLabel { background-color: #873f9d; color: white; border-radius: 10px; padding: 5px; }"
+        assistant_style = "QLabel { background-color: #333333; color: white; border-radius: 10px; padding: 5px; }"
+
         if sender == Sender.USER:
-            self.label.setStyleSheet(
-                "QLabel { background-color: #873f9d; color: white; border-radius: 10px; padding: 5px; }")
+            self.label.setStyleSheet(user_style)
         else:  # Sender.ASSISTANT
-            self.label.setStyleSheet(
-                "QLabel { background-color: #333333; color: white; border-radius: 10px; padding: 5px; }")
+            self.label.setStyleSheet(assistant_style)
+
+        self.label.setTextFormat(Qt.RichText)
 
     def fade_out(self):
         self.opacityEffect = QGraphicsOpacityEffect(self)
