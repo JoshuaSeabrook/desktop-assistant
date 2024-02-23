@@ -1,4 +1,4 @@
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtWidgets import QApplication, QVBoxLayout, QWidget, QMainWindow, QLineEdit, QPushButton, \
     QHBoxLayout, QListWidget, QListWidgetItem
 
@@ -98,5 +98,16 @@ class MainWindow(QMainWindow):
         chat_bubble = ChatBubble(message, sender)
         item = QListWidgetItem(self.chatDisplay)
         item.setSizeHint(chat_bubble.sizeHint())
+        chat_bubble.fadeOutFinished.connect(lambda: self.remove_message(item))
         self.chatDisplay.addItem(item)
         self.chatDisplay.setItemWidget(item, chat_bubble)
+
+        timer = QTimer(self)
+        timer.setSingleShot(True)
+        timer.timeout.connect(lambda: chat_bubble.fade_out())
+        timer.start(10000)
+
+    def remove_message(self, item):
+        index = self.chatDisplay.row(item)
+        if index != -1:
+            self.chatDisplay.takeItem(index)
