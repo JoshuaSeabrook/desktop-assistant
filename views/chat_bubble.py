@@ -18,6 +18,7 @@ class ChatBubble(QWidget):
         self.label = QLabel()
         self.label.setWordWrap(True)
         self.label.setText(html_text)
+        self.label.setFixedWidth(self.width() - 80)  # Fixes weird text wrapping height issues
         layout.addWidget(self.label)
         self.setLayout(layout)
 
