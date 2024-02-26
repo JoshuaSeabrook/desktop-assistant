@@ -1,4 +1,4 @@
-from PyQt5.QtCore import Qt, QTimer
+from PyQt5.QtCore import Qt, QTimer, QSize
 from PyQt5.QtWidgets import QApplication, QVBoxLayout, QWidget, QMainWindow, QLineEdit, QPushButton, \
     QHBoxLayout, QListWidget, QListWidgetItem
 
@@ -11,6 +11,8 @@ class MainWindow(QMainWindow):
     def __init__(self, controller):
         super().__init__()
         self.controller = controller
+
+        self.previous_sender = Sender.USER
 
         self.setAttribute(Qt.WA_TranslucentBackground)
         self.setWindowFlags(Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint | Qt.WA_TranslucentBackground)
@@ -28,8 +30,9 @@ class MainWindow(QMainWindow):
         self.userInput.returnPressed.connect(self.send_message)
         self.inputLayout.addWidget(self.userInput)
 
-        self.chatButton = QPushButton("Chat")
-        self.chatButton.setFixedWidth(50)
+        self.chatButton = QPushButton(";)")
+        button_size = 30  # Set both width and height to this value to get a square
+        self.chatButton.setFixedSize(button_size, button_size)  # Use setFixedSize to ensure the button remains square
 
         self.inputLayout.addWidget(self.chatButton, 0, Qt.AlignRight)
         self.layout.addLayout(self.inputLayout)
@@ -40,34 +43,32 @@ class MainWindow(QMainWindow):
         self.position_window()
 
         # Styling
-        self.setStyleSheet("""
-            QMainWindow {
+        self.setStyleSheet(f"""
+            QMainWindow {{
                 background-color: transparent;  
-            }
-            QLineEdit {
+            }}
+            QLineEdit {{
                 background-color: #333333;
                 color: white;
                 border: 1px solid #808080;
                 border-radius: 10px;
                 padding: 5px;
-            }
-            QListWidget {
+            }}
+            QListWidget {{
                 background-color: transparent;  
                 border: none;  
-            }
-            QPushButton {
+            }}
+            QPushButton {{
+                border-radius: {button_size / 2}px;
                 background-color: #873f9d;
                 color: white;
-                padding: 5px;
-                font-size: 14px;
-                border-radius: 10px;
-            }
-            QPushButton:hover {
+            }}
+            QPushButton:hover {{
                 background-color: #9e5fb7;
-            }
-            QListWidget::item:selected, QListWidget::item:hover {
+            }}
+            QListWidget::item:selected, QListWidget::item:hover {{
                 background-color: transparent;
-            }
+            }}
         """)
 
     def position_window(self):
@@ -97,6 +98,21 @@ class MainWindow(QMainWindow):
             self.userInput.clear()
 
     def display_message(self, message, sender=Sender.ASSISTANT):
+        # If the sender has changed, add a spacer item before the regular chat bubble
+        if self.previous_sender != sender:
+            spacer_item = QListWidgetItem(self.chatDisplay)
+            spacer_item.setSizeHint(QSize(0, 10))
+            self.chatDisplay.addItem(spacer_item)
+
+            # Remove the spacer item after a delay
+            spacer_timer = QTimer(self)
+            spacer_timer.setSingleShot(True)
+            spacer_timer.timeout.connect(lambda: self.remove_message(spacer_item))
+            spacer_timer.start(11000)
+
+            # Update previous_sender
+            self.previous_sender = sender
+
         chat_bubble = ChatBubble(message, sender)
         item = QListWidgetItem(self.chatDisplay)
         item.setSizeHint(chat_bubble.sizeHint())
