@@ -25,8 +25,8 @@ class ChatBubble(QWidget):
         self.setLayout(layout)
 
         # Apply CSS styles for USER and ASSISTANT differently
-        user_style = "QLabel { background-color: #873f9d; color: white; border-radius: 10px; padding: 5px; }"
-        assistant_style = "QLabel { background-color: #333333; color: white; border-radius: 10px; padding: 5px; }"
+        user_style = "QLabel { background-color: #333333; color: white; border-radius: 10px; padding: 5px; }"
+        assistant_style = "QLabel { background-color: #873f9d; color: white; border-radius: 10px; padding: 5px; }"
 
         if sender == Sender.USER:
             self.label.setStyleSheet(user_style)
