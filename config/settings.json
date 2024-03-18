@@ -1,3 +1,14 @@
 {
- "system_message" : "You are a desktop assistant. Your name is Steve."
+    "assistant_personality": "You are a personal desktop assistant.",
+    "user_info": "You have no specific info on your user",
+    "external_applications": [
+        {
+            "app_name": "Microsoft Edge",
+            "app_path": "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe",
+            "app_description": "Microsoft Edge is the default Windows web browser."
+        }
+    ],
+    "assistant_chat_bubbles": true,
+    "voice_input": false
 }
+

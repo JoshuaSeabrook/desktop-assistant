@@ -1,8 +1,11 @@
-from PyQt5.QtCore import Qt, QTimer, QSize
+import winsound
+from PyQt5.QtCore import Qt, QTimer, QSize, Q_ARG
 from PyQt5.QtWidgets import QApplication, QVBoxLayout, QWidget, QMainWindow, QLineEdit, QPushButton, \
-    QHBoxLayout, QListWidget, QListWidgetItem
+    QHBoxLayout, QListWidget, QListWidgetItem, QSpacerItem, QSizePolicy
 
 from enums import *
+from utils.settings_manager import SettingsManager
+from views.assistant_icon import AssistantIcon
 from views.chat_bubble import ChatBubble
 from views.text_input import TextInput
 
@@ -20,6 +23,11 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(self.centralWidget)
         self.layout = QVBoxLayout()
 
+        self.assistant_icon = AssistantIcon(self)
+        # Add a spacer to push the icon down
+        spacer = QSpacerItem(20, 55, QSizePolicy.Minimum)
+        self.layout.insertSpacerItem(0, spacer)
+
         self.chatDisplay = QListWidget()
         self.chatDisplay.setAttribute(Qt.WA_TranslucentBackground)
         self.layout.addWidget(self.chatDisplay)
@@ -31,15 +39,14 @@ class MainWindow(QMainWindow):
         self.inputLayout.addWidget(self.userInput)
 
         self.chatButton = QPushButton(";)")
-        button_size = 30  # Set both width and height to this value to get a square
-        self.chatButton.setFixedSize(button_size, button_size)  # Use setFixedSize to ensure the button remains square
+        button_size = 30
+        self.chatButton.setFixedSize(button_size, button_size)
 
         self.inputLayout.addWidget(self.chatButton, 0, Qt.AlignRight)
         self.layout.addLayout(self.inputLayout)
         self.centralWidget.setLayout(self.layout)
 
         self.chatButton.clicked.connect(self.toggle_input_window)
-        self.userInput.setVisible(False)  # userInput should start hidden
         self.position_window()
 
         # Styling
@@ -48,10 +55,10 @@ class MainWindow(QMainWindow):
                 background-color: transparent;  
             }}
             QLineEdit {{
-                background-color: #333333;
+                background-color: rgba(51, 51, 51, 0.9);
                 color: white;
-                border: 1px solid #808080;
-                border-radius: 10px;
+                border: 1px solid rgba(128, 128, 128, 0.9);
+                border-radius: 3px;
                 padding: 5px;
             }}
             QListWidget {{
@@ -59,12 +66,12 @@ class MainWindow(QMainWindow):
                 border: none;  
             }}
             QPushButton {{
-                border-radius: {button_size / 2}px;
-                background-color: #873f9d;
+                border-radius: 5px;
+                background-color: rgba(74, 65, 177, 0.9);
                 color: white;
             }}
             QPushButton:hover {{
-                background-color: #9e5fb7;
+                background-color: rgba(54, 45, 157, 1.0);
             }}
             QListWidget::item:selected, QListWidget::item:hover {{
                 background-color: transparent;
@@ -72,8 +79,7 @@ class MainWindow(QMainWindow):
         """)
 
     def position_window(self):
-        # Positions and resizes the window. Currently set to 600px width and full height,
-        # on the right side of the screen.
+        """Positions the window."""
         screen = QApplication.primaryScreen().geometry()
         screen_width = screen.width()
 
@@ -87,17 +93,23 @@ class MainWindow(QMainWindow):
         self.move(x, y)
 
     def toggle_input_window(self):
-        # Toggle the visibility of the userInput widget
-        self.userInput.setFocus()
-        self.userInput.setVisible(not self.userInput.isVisible())
+        """Toggle the visibility of the userInput widget, or process audio input if voice input is enabled."""
+        if SettingsManager().get_setting("voice_input", True):
+            self.controller.process_audio_input()
+        else:
+            self.userInput.setFocus()
+            self.userInput.setVisible(not self.userInput.isVisible())
+
 
     def send_message(self):
+        """Sends a message to the controller."""
         user_text = self.userInput.text().strip()
         if user_text:  # Ensure input is not just whitespace
-            self.controller.process_input(user_text)
+            self.controller.process_input(user_text, True)
             self.userInput.clear()
 
     def display_message(self, message, sender=Sender.ASSISTANT):
+        """Displays a message in the chat display."""
         # If the sender has changed, add a spacer item before the regular chat bubble
         if self.previous_sender != sender:
             spacer_item = QListWidgetItem(self.chatDisplay)
@@ -108,7 +120,7 @@ class MainWindow(QMainWindow):
             spacer_timer = QTimer(self)
             spacer_timer.setSingleShot(True)
             spacer_timer.timeout.connect(lambda: self.remove_message(spacer_item))
-            spacer_timer.start(11000)
+            spacer_timer.start(21000)
 
             # Update previous_sender
             self.previous_sender = sender
@@ -123,9 +135,10 @@ class MainWindow(QMainWindow):
         timer = QTimer(self)
         timer.setSingleShot(True)
         timer.timeout.connect(lambda: chat_bubble.fade_out())
-        timer.start(10000)
+        timer.start(20000)
 
     def remove_message(self, item):
+        """Removes a message from the chat display."""
         index = self.chatDisplay.row(item)
         if index != -1:
             self.chatDisplay.takeItem(index)
