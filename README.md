@@ -4,7 +4,6 @@
 A desktop assistant with integrated GPT-4 natural language processing. The assistant can perform a variety of tasks, such as sending emails, fetching information from the web, and file handling. 
 
 ## Features
-List the key features of your desktop assistant. For example:
 - Voice commands for performing tasks
 - Integration with external APIs for fetching information (weather, news)
 - Email reading and sending capabilities
