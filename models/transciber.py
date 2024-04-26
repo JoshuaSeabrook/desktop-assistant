@@ -8,6 +8,8 @@ from PyQt5.QtCore import QThread, pyqtSignal, pyqtSlot
 from openai import OpenAI
 from scipy.io.wavfile import write
 
+from utils.settings_manager import SettingsManager
+
 
 class Transcriber(QThread):
     transcription_complete = pyqtSignal(str)  # Signal to emit the transcribed text
@@ -23,7 +25,8 @@ class Transcriber(QThread):
         self.model = model
         self.silence_threshold = silence_threshold
         self.silence_duration = silence_duration
-        self.client = OpenAI()  # Initialize OpenAI client here
+        self.settings_manager = SettingsManager()
+        self.client = OpenAI(api_key=self.settings_manager.get_setting("api_key"))  # Initialize OpenAI client here
         self.audio_queue = queue.Queue()
 
     def audio_callback(self, indata):

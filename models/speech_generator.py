@@ -26,6 +26,8 @@ class SpeechGenerator(QObject):
         self.timer.timeout.connect(self.play_next_audio)
         self.timer.start(1000)
         self.total_chars = 0
+        self.settings_manager = SettingsManager()
+        self.client = OpenAI(api_key=self.settings_manager.get_setting("api_key"))
 
     @pyqtSlot()
     def process_sentences(self):
@@ -34,9 +36,9 @@ class SpeechGenerator(QObject):
             self.total_chars += len(self.sentence_queue[0])
             try:
                 next_sentence = self.sentence_queue[0]
-                client = OpenAI()
 
-                response = client.audio.speech.create(
+
+                response = self.client.audio.speech.create(
                     model="tts-1-hd",
                     voice="nova",
                     input=next_sentence,

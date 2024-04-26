@@ -14,12 +14,13 @@ class ResponseGenerator(QObject):
     function_call = pyqtSignal(str, str)
     function_call_completed = pyqtSignal()
 
-    def __init__(self, model: str = "gpt-4-1106-preview", functions=None):
+    def __init__(self, model: str = "gpt-4-turbo", functions=None):
         super().__init__()
-        self.client = OpenAI()
+
         self.model = model
         self.settings_manager = SettingsManager()
         self.called_function = None
+        self.client = OpenAI(api_key=self.settings_manager.get_setting("api_key"))
         self.sentence_buffer = ""
         self.full_response = ""  # Initialize a variable to accumulate the full response
         system_message = self.settings_manager.get_setting("assistant_personality", "You are a desktop assistant.")  # Loads the assistant's personality

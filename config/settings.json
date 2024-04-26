@@ -9,6 +9,6 @@
         }
     ],
     "assistant_chat_bubbles": true,
-    "voice_input": false
+    "voice_input": false,
+    "api_key": "INSERT_OPENAI_API_KEY_HERE"
 }
-
