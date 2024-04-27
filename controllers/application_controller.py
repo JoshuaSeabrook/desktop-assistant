@@ -297,6 +297,23 @@ class ApplicationController:
                         "required": ["file_path"]
                     },
                 }
+            },
+            {
+                "type": "function",
+                "function": {
+                    "name": "exit_program",
+                    "description": "Exits the desktop assistant program",
+                    "parameters": {
+                        "type": "object",
+                        "properties": {
+                            "dir_path": {
+                                "type": "string",
+                                "description": "The path of the directory"
+                            },
+                        },
+                        "required": []
+                    },
+                }
             }
         ]
         return functions
@@ -333,6 +350,8 @@ class ApplicationController:
                     return_string = self.file_handler.open_file_with_default_program(arguments["file_path"])
                 case "get_files_in_directory":  # Returns a list of files and directories in a directory
                     return_string = str(self.file_handler.get_files_in_directory(arguments["dir_path"]))
+                case "exit_program":
+                    sys.exit()
         except Exception as e:
             return_string = str(e)
         # Return the result of the function call to the ResponseGenerator
